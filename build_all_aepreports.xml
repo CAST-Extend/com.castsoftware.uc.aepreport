@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project com.castsoftware.uc.restapi.reports with Jar-in-Jar Loader">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    
+    <!-- package version, should be the same as attribute VERSION located in java class RestAPIReports -->
+	<property file = "version.properties"/>
+	
+	<!-- Output directory where the package will generate the binary package -->  
+	<!-- on MMR workstation -->
+	<property name="output.dir" value="C:\Temp\MMR\AEPReport_AllReports_build"/>
+	<!-- on TelefonicaPortal VM -->
+	<!-- property name="output.dir" value="E:\Drives\I\Tools\RestAPIReports_AllReports_build"/ -->
+	
+	<!-- Local eclipse project directory -->  
+	<!-- on MMR workstation -->
+	<property name="project.dir" value="C:/Users/mmr/workspace/com.castsoftware.uc.aepreport_local"/>
+	<!-- on TelefonicaPortal VM -->
+	<!-- property name="project.dir" value="E:/Drives/I/eclipse-workspace/com.castsoftware.uc.aepreports"/ -->
+	
+	<target name="create_run_jar">
+		<delete dir="${output.dir}/${version}" />
+		<mkdir dir="${output.dir}/${version}/AEPReport_AllReports" />
+        <jar destfile="${output.dir}/${version}/AEPReport_AllReports/AEPReport-${version}.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="com.castsoftware.uc.aepreport.AEPReport"/>
+                <attribute name="Class-Path" value="."/>
+                <!-- attribute name="Rsrc-Class-Path" value="./ commons-io-2.5.jar log4j-1.2.17.jar commons-logging-1.2.jar httpclient-4.5.3.jar httpcore-4.4.6.jar jackson-core-2.8.8.jar org.json-2.0.jar dom4j-1.6.1.jar ooxml-schemas-1.0.jar poi-3.17.jar poi-ooxml-3.17.jar xmlbeans-5.1.3.jar commons-collections4-4.1.wso2v1.jar postgresql-8.3-603.jdbc3 commons-cli-1.2.jar"/ -->
+            	<attribute name="Rsrc-Class-Path" value="./ commons-io-2.5.jar log4j-1.2.17.jar commons-logging-1.2.jar ooxml-schemas-1.0.jar poi-3.17.jar poi-ooxml-3.17.jar xmlbeans-5.1.3.jar commons-collections4-4.1.wso2v1.jar postgresql-8.3-603.jdbc3.jar commons-cli-1.2.jar"/>
+            	<attribute name="Implementation-Version" value="${version}" />
+            </manifest>
+            <zipfileset src="jar-in-jar-loader.zip"/>
+            <fileset dir="${project.dir}/bin"/>
+        	<zipfileset file="version.properties" />
+            <zipfileset dir="${project.dir}\lib" includes="commons-io-2.5.jar"/>
+            <zipfileset dir="${project.dir}\lib" includes="log4j-1.2.17.jar"/>
+            <zipfileset dir="${project.dir}\lib" includes="commons-logging-1.2.jar"/>
+            <!--zipfileset dir="${project.dir}\lib" includes="httpclient-4.5.3.jar"/>
+            <zipfileset dir="${project.dir}\lib" includes="httpcore-4.4.6.jar"/>
+            <zipfileset dir="${project.dir}\lib" includes="jackson-core-2.8.8.jar"/>
+            <zipfileset dir="${project.dir}\lib" includes="org.json-2.0.jar"/>
+        	<zipfileset dir="${project.dir}\lib" includes="dom4j-1.6.1.jar"/ -->
+        	<zipfileset dir="${project.dir}\lib" includes="ooxml-schemas-1.0.jar"/>
+        	<zipfileset dir="${project.dir}\lib" includes="poi-3.17.jar"/>
+        	<zipfileset dir="${project.dir}\lib" includes="poi-ooxml-3.17.jar"/>
+        	<zipfileset dir="${project.dir}\lib" includes="xmlbeans-5.1.3.jar"/>
+        	<zipfileset dir="${project.dir}\lib" includes="commons-collections4-4.1.wso2v1.jar"/>
+        	<zipfileset dir="${project.dir}\lib" includes="postgresql-8.3-603.jdbc3.jar"/>	
+        	<zipfileset dir="${project.dir}\lib" includes="commons-cli-1.2.jar"/>
+        </jar>
+        <copy file="./resources/start_aepreport.template.bat" tofile="${output.dir}/${version}/AEPReport_AllReports/start_aepreport.bat" />
+        <copy file="./version.properties" tofile="${output.dir}/${version}/AEPReport_AllReports/version.properties" />
+
+		
+		<zip destfile="${output.dir}/${version}/AEPReport_AllReports-${version}.zip">
+				<fileset dir="${output.dir}/${version}" />
+		</zip>
+		<zip destfile="${output.dir}/${version}/AEPReport_AllReports-${version}-src.zip">
+				<fileset dir="${project.dir}" />
+		</zip>
+		<!-- delete dir="${output.dir}/${version}/RestAPIReports_AllReports" / -->
+		
+		<delete dir="${project.dir}/dist" />
+		<copy todir="${project.dir}/dist">
+	        	<fileset dir="${output.dir}/${version}/AEPReport_AllReports"/>
+				<fileset file="${project.dir}/plugin.nuspec"/>
+				<fileset file="${project.dir}/LICENCE"/>
+				<fileset file="${project.dir}/README.md"/>
+	    </copy>	
+		
+		<!--Nugget command to package the extension -->
+		<exec executable="cmd">
+		    <arg value="/c"/>
+		    <arg value="nugget_package.bat"/>
+			<arg value="${version}"/>
+		</exec>
+		<delete dir="${project.dir}/dist_nuget" />
+		<move file="${project.dir}/com.castsoftware.uc.aepreport.${version}.nupkg" todir="${project.dir}/dist_nuget" />
+	
+		
+    </target>
+</project>

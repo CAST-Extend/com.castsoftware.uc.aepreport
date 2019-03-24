@@ -1,0 +1,93 @@
+@echo off
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+SET ENVIRONMENT=DEV
+SET RUNSQL=-dbRunSql
+SET CSSHOST=telefonicacss
+SET CSSPORT=2280
+SET CSSDB=postgres
+SET CSSUSER=operator
+SET CSSPWD=CastAIP
+SET CENTRALSCHEMAS=u586_ayyildiz_central,u586_blau_central,u586_nett_central,u586_norma_central,u586_ortel_central,u586_tapcms_central,u586_whatsapp_central,u320_salcus_central,u043_nms_central,u057_uni_fss_billing_central,u101_cactus_2507_central,u241_sas_central,u323_spain_central,u461_ppit_central,u486_portal_b2c_central,u535_epos_central,u692_mobile_apps_central,u784_som_central,u941_mce_central,u950_bos_central
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::VERSIONS_LASTONE|VERSIONS_LASTTWO|VERSIONS_ALL
+:: All versions
+SET VERSION_FILTER=-versionFilter VERSIONS_ALL
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: All applications
+SET PROCESSAPPLICATION_FILTER=
+:: Only PPIT
+::SET PROCESSAPPLICATION_FILTER=-processApplicationFilter "U-461 - Prepaid IT Systems (PPIT)"
+::U-586 - norma-mobil
+::U-486 - Portal B2C Complete
+::U-950 - Business Online Service
+::U-586 - ortelmobile
+::U-535 - ePOS
+::U-784 - SOM
+::U-486 - Portal B2C Postpaid Selfcare
+::U-043 - NUMSmnp - NMS GUI
+::U-241 - SAS
+::U-586 - whatsapp
+::U-941 - Multi Channel Engine (MCE)
+::U-320 - SALCUS
+::U-323 - SPAIN
+::U-043 - NUMSmnp - MAROS
+::U-461 - Prepaid IT Systems (PPIT)
+::U-057 - Unified-FSS-Billing
+::U-101 - Cactus
+::U-586 - ayyildiz
+::U-692 - Mobile Apps HH
+::U-586 - nettokom
+::U-586 - blauworld
+::U-043 - NUMSmnp - NUMS
+::U-586 - TAPCMS
+
+::Environment (optional)
+::SET ENVIRONMENT=-environment DEV 
+
+::Output file prefix (default=AEPReport)
+::SET PREFIX=-outputFilePrefix AEPReport
+
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+SET JAVA_HOME=C:\Program Files\Java\jre1.8.0_181
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+For /F "tokens=1* delims==" %%A IN (version.properties) DO (
+    IF "%%A"=="version" set VERSION=%%B
+)
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+::Check JRE Installation
+IF NOT EXIST "%JAVA_HOME%\bin" GOTO JREPathNotSet
+
+SET CMD="%JAVA_HOME%\bin\java" -jar AEPReport-%VERSION%.jar %ENVIRONMENT% %PREFIX% %PROCESSAPPLICATION_FILTER% %VERSION_FILTER% -dbHost %CSSHOST% -dbPort %CSSPORT% -dbDatabaseName %CSSDB% -dbUser %CSSUSER% -dbPassword %CSSPWD% -dbSchemas %CENTRALSCHEMAS%
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+ECHO running %CMD%
+%CMD%
+ECHO ========================================
+SET RETURNCODE=%ERRORLEVEL%
+IF NOT %RETURNCODE%==0 GOTO execError
+GOTO end
+
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+:JREPathNotSet
+ECHO The JRE Path %JAVA_HOME% is not correct
+GOTO end
+
+:execError
+ECHO Error executing the command line
+GOTO end
+
+:end
+
+PAUSE
